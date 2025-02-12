@@ -11,6 +11,8 @@ This is a skeleton you can use to start your projects.
 
 This project template contains starter code for your class project. The `/service` folder contains your `models.py` file for your model and a `routes.py` file for your service. The `/tests` folder has test case starter code for testing the model and the service separately. All you need to do is add your functionality. You can use the [lab-flask-tdd](https://github.com/nyu-devops/lab-flask-tdd) for code examples to copy from.
 
+The shopcarts service allows customers to make a collection of products that they want to purchase. At a minimum, it should contain a reference to the product id, a description, and the quantity the customer wants to buy.  It may also contain the price of the product at the time they placed it in the cart. A customer will only have one shopcart. Since this is really a collection of product items, you will need to implement a subordinate REST API to manipulate items in the shopcarts collection (e.g., /shopcarts/{id}/items/{id}). You also will need to associate the shopcart with a customer preferably through their customer id
+
 ## Automatic Setup
 
 The best way to use this repo is to start your own repo using it as a git template. To do this just press the green **Use this template** button in GitHub and this will become the source for your repository.
