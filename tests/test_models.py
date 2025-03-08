@@ -73,9 +73,7 @@ class TestShopcart(TestCase):
         found = Shopcart.all()
         self.assertEqual(len(found), 1)
         data = Shopcart.find(shopcart.id)
-        self.assertEqual(data.name, shopcart.name)
-        self.assertEqual(data.quantity, shopcart.quantity)
-        self.assertEqual(data.price, shopcart.price)
+        self.assertEqual(data.customer_id = shopcart.customer_id)
         self.assertEqual(data.time_atc, shopcart.time_atc)
 
     # Todo: Add your test cases here...

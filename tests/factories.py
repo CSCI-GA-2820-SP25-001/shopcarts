@@ -15,9 +15,8 @@ class ShopcartFactory(factory.Factory):
         model = Shopcart
 
     id = factory.Sequence(lambda n: n)
-    name = factory.Faker("name")
-    quantity = factory.Faker("quantity")
-    price = factory.Faker("price")
-    time_atc = factory.Faker("time_atc")
+    customer_id = factory.Sequence(lambda n: n)
+
+    time_atc = factory.Faker("date_time_between", start_date="-2y", end_date="now")
 
     # Todo: Add your other attributes here...

@@ -5,21 +5,13 @@ All of the models are stored in this module
 """
 
 import logging
-from flask_sqlalchemy import SQLAlchemy
 
 from .persistent_base import db, PersistentBase, DataValidationError
 
 logger = logging.getLogger("flask.app")
 
-# Create the SQLAlchemy object to be initialized later in init_db()
-db = SQLAlchemy()
 
-
-class DataValidationError(Exception):
-    """Used for an data validation errors when deserializing"""
-
-
-class Shopcart(db.Model):
+class Shopcart(db.Model, PersistentBase):
     """
     Class that represents a Shopcart
     """
