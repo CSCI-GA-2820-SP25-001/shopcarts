@@ -7,6 +7,7 @@ All of the models are stored in this module
 import logging
 
 from .persistent_base import db, PersistentBase, DataValidationError
+from .item import Item
 
 logger = logging.getLogger("flask.app")
 
