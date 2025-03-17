@@ -27,16 +27,32 @@ from service.models import Shopcart
 from service.common import status  # HTTP Status Codes
 
 
+
+######################################################################
+# GET HEALTH CHECK
+######################################################################
+@app.route("/health")
+def health_check():
+    """Let them know our heart is still beating"""
+    return jsonify(status=200, message="Healthy"), status.HTTP_200_OK
+
+
 ######################################################################
 # GET INDEX
 ######################################################################
 @app.route("/")
 def index():
     """Root URL response"""
+    app.logger.info("Request for Root URL")
     return (
-        "Reminder: return some useful information in json format about the service here",
+        jsonify(
+            name="Pet Demo REST API Service",
+            version="1.0",
+            paths=url_for("list_shopcarts", _external=True),
+        ),
         status.HTTP_200_OK,
     )
+
 
 
 ######################################################################
@@ -276,7 +292,6 @@ def list_shopcarts():
     app.logger.info("Returning %d shopcarts", len(results))
     return jsonify(results), status.HTTP_200_OK
 
-
 ######################################################################
 # READ AN ITEM FROM SHOPCART
 ######################################################################
@@ -300,3 +315,22 @@ def get_items(account_id, item_id):
         )
 
     return jsonify(item.serialize()), status.HTTP_200_OK
+=======
+######################################################################
+# DELETE A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>", methods=["DELETE"])
+def delete_shopcarts(shopcart_id):
+    """
+    Delete a shopcart
+    This endpoint will delete a shopcart based the id specified in the path
+    """
+    app.logger.info("Request to Delete a shopcart with id [%s]", shopcart_id)
+    # Delete the shopcart if it exists
+    shopcart = shopcart.find(shopcart_id)
+    if shopcart:
+        app.logger.info("shopcart with ID: %d found.", shopcart.id)
+        shopcart.delete()
+    app.logger.info("shopcart with ID: %d delete complete.", shopcart_id)
+    return {}, status.HTTP_204_NO_CONTENT
+
