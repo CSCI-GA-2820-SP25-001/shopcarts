@@ -44,6 +44,32 @@ def index():
 ######################################################################
 
 
+
+# ######################################################################
+# UPDATE AN EXISTING Shopcart
+######################################################################
+@app.route("/shopcarts/<int:item_id>", methods=["PUT"])
+def update_items(item_id):
+    """
+    Update an Shopcart
+
+    This endpoint will update an Shopcart based the body that is posted
+    """
+    app.logger.info("Request to update Shopcart with id: %s", item_id)
+    check_content_type("application/json")
+
+    # See if the Shopcart exists and abort if it doesn't
+    Shopcart = Shopcart.find(item_id)
+    if not Shopcart:
+        abort(status.HTTP_404_NOT_FOUND, f"Shopcart with id '{item_id}' was not found.")
+
+    # Update from the json in the body of the request
+    Shopcart.deserialize(request.get_json())
+    Shopcart.id = item_id
+    Shopcart.update()
+
+    return jsonify(Shopcart.serialize()), status.HTTP_200_OK
+=======
 ######################################################################
 
 # CREATE A NEW SHOPCART
