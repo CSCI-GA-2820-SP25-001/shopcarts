@@ -43,4 +43,63 @@ def index():
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
 
-# Todo: Place your REST API code here ...
+
+######################################################################
+# CREATE A NEW ITEM IN SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items", methods=["POST"])
+def create_items(shopcart_id):
+    """
+    Create an items on an shopcart
+
+    This endpoint will add an items to an shopcart
+    """
+    app.logger.info("Request to create an items for shopcart with id: %s", shopcart_id)
+    check_content_type("application/json")
+
+    # See if the shopcart exists and abort if it doesn't
+    shopcart = shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"shopcart with id '{shopcart_id}' could not be found.",
+        )
+
+    # Create an items from the json data
+    items = items()
+    items.deserialize(request.get_json())
+
+    # Append the items to the shopcart
+    shopcart.items.append(items)
+    shopcart.update()
+
+    # Prepare a message to return
+    message = items.serialize()
+
+    # Send the location to GET the new item
+    location_url = url_for(
+        "get_items", shopcart_id=shopcart.id, items_id=items.id, _external=True
+    )
+    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+
+
+######################################################################
+# DELETE AN ITEM
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items/<int:items_id>", methods=["DELETE"])
+def delete_items(shopcart_id, item_id):
+    """
+    Delete an item
+
+    This endpoint will delete an item based the id specified in the path
+    """
+    app.logger.info(
+        "Request to delete item %s for shopcart id: %s", (item_id, shopcart_id)
+    )
+
+    # See if the item exists and delete it if it does
+    item = item.find(item_id)
+    if item:
+        item.delete()
+
+    return "", status.HTTP_204_NO_CONTENT
