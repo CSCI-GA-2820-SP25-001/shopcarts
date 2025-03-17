@@ -42,7 +42,8 @@ class Shopcart(db.Model, PersistentBase):
         }
         for item in self.items:
             shopcart["items"].append(item.serialize())
-            return shopcart
+
+        return shopcart
 
     def deserialize(self, data):
         """
@@ -52,15 +53,15 @@ class Shopcart(db.Model, PersistentBase):
             data (dict): A dictionary containing the resource data
         """
         try:
+            self.id = data["id"]
             self.customer_id = data["customer_id"]
             self.time_atc = data["time_atc"]
             # handle inner list of items
-            item_list = data.get("item_id")
+            item_list = data.get("items")
             for json_item in item_list:
                 item = Item()
                 item.deserialize(json_item)
-                item.shopcart_id = self.id
-                self.item.append(item)
+                self.items.append(item)
 
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
