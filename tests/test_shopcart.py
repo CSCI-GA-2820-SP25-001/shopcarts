@@ -86,7 +86,7 @@ class TestShopcart(TestCase):
         """It should Create an shopcart and assert that it exists"""
         fake_shopcart = ShopcartFactory()
         # pylint: disable=unexpected-keyword-arg
-        shopcart = shopcart(
+        shopcart = Shopcart(
             id=fake_shopcart.id,
             customer_id=fake_shopcart.customer_id,
             time_atc=fake_shopcart.time_atc,
@@ -98,7 +98,7 @@ class TestShopcart(TestCase):
 
     def test_add_a_shopcart(self):
         """It should Create an shopcart and add it to the database"""
-        shopcarts = shopcart.all()
+        shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
         shopcart = ShopcartFactory()
         shopcart.create()
@@ -218,13 +218,11 @@ class TestShopcart(TestCase):
         shopcart.items.append(ItemFactory())
         shopcart.create()
         serial_shopcart = shopcart.serialize()
-        new_shopcart = shopcart()
+        new_shopcart = Shopcart()
         new_shopcart.deserialize(serial_shopcart)
-        self.assertEqual(new_shopcart.name, shopcart.name)
-        self.assertEqual(new_shopcart.userid, shopcart.userid)
-        self.assertEqual(new_shopcart.email, shopcart.email)
-        self.assertEqual(new_shopcart.phone_number, shopcart.phone_number)
-        self.assertEqual(new_shopcart.date_joined, shopcart.date_joined)
+        self.assertEqual(new_shopcart.id, shopcart.id)
+        self.assertEqual(new_shopcart.customer_id, shopcart.customer_id)
+        self.assertEqual(new_shopcart.time_atc, shopcart.time_atc)
 
     def test_deserialize_with_key_error(self):
         """It should not Deserialize an shopcart with a KeyError"""

@@ -57,7 +57,7 @@ class ItemFactory(factory.Factory):
             "Beef",
         ]
     )
-    description = factory.Faker("sentence", nb_words=10)
+    description = factory.Faker("sentence", nb_words=3)
     quantity = FuzzyInteger(1, 20)
     price = FuzzyDecimal(0.50, 20.00, precision=2)
     shopcart = factory.SubFactory(ShopcartFactory)

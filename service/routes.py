@@ -85,10 +85,6 @@ def update_items(item_id):
 
     return jsonify(Shopcart.serialize()), status.HTTP_200_OK
 
-
-######################################################################
-
-
 # CREATE A NEW SHOPCART
 ######################################################################
 @app.route("/shopcarts", methods=["POST"])
@@ -134,8 +130,6 @@ def check_content_type(content_type):
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, f"Content-Type must be {content_type}"
     )
 
-
-######################################################################
 # CREATE A NEW ITEM IN SHOPCART
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>/items", methods=["POST"])
@@ -315,7 +309,6 @@ def get_items(account_id, item_id):
         )
 
     return jsonify(item.serialize()), status.HTTP_200_OK
-=======
 ######################################################################
 # DELETE A SHOPCART
 ######################################################################
@@ -333,4 +326,3 @@ def delete_shopcarts(shopcart_id):
         shopcart.delete()
     app.logger.info("shopcart with ID: %d delete complete.", shopcart_id)
     return {}, status.HTTP_204_NO_CONTENT
-
