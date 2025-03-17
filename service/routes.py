@@ -202,7 +202,8 @@ def get_shopcarts(shopcart_id):
 
     app.logger.info("Returning Shopcart: %s", Shopcart.name)
     return jsonify(Shopcart.serialize()), status.HTTP_200_OK
-  
+
+
 ######################################################################
 # UPDATE AN EXISTING SHOPCART
 ######################################################################
@@ -219,7 +220,10 @@ def update_shopcarts(shopcart_id):
     # Attempt to find the Shopcart and abort if not found
     shopcart = Shopcart.find(shopcart_id)
     if not shopcart:
-        abort(status.HTTP_404_NOT_FOUND, f"Shopcart with id '{shopcart_id}' was not found.")
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' was not found.",
+        )
 
     # Update the Shopcart with the new data
     data = request.get_json()
@@ -231,6 +235,7 @@ def update_shopcarts(shopcart_id):
 
     app.logger.info("Shopcart with ID: %d updated.", shopcart.id)
     return jsonify(shopcart.serialize()), status.HTTP_200_OK
+
 
 ######################################################################
 # LIST ALL SHOPCARTS
@@ -271,3 +276,27 @@ def list_shopcarts():
     app.logger.info("Returning %d shopcarts", len(results))
     return jsonify(results), status.HTTP_200_OK
 
+
+######################################################################
+# READ AN ITEM FROM SHOPCART
+######################################################################
+@app.route("/accounts/<int:account_id>/items/<int:item_id>", methods=["GET"])
+def get_items(account_id, item_id):
+    """
+    Get an Item
+
+    This endpoint returns just an item
+    """
+    app.logger.info(
+        "Request to retrieve Item %s for Shopcart id: %s", (item_id, account_id)
+    )
+
+    # See if the item exists and abort if it doesn't
+    item = Item.find(item_id)
+    if not item:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{item_id}' could not be found.",
+        )
+
+    return jsonify(item.serialize()), status.HTTP_200_OK
