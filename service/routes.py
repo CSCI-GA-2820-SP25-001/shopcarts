@@ -44,7 +44,6 @@ def index():
 ######################################################################
 
 
-
 # ######################################################################
 # UPDATE AN EXISTING Shopcart
 ######################################################################
@@ -69,9 +68,9 @@ def update_items(item_id):
     Shopcart.update()
 
     return jsonify(Shopcart.serialize()), status.HTTP_200_OK
-=======
-######################################################################
 
+
+######################################################################
 # CREATE A NEW SHOPCART
 ######################################################################
 @app.route("/shopcarts", methods=["POST"])
@@ -95,7 +94,6 @@ def create_shopcart():
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
-
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
@@ -117,7 +115,8 @@ def check_content_type(content_type):
     abort(
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, f"Content-Type must be {content_type}"
     )
-=======
+
+
 # CREATE A NEW ITEM IN SHOPCART
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>/items", methods=["POST"])
@@ -176,4 +175,3 @@ def delete_items(shopcart_id, item_id):
         item.delete()
 
     return "", status.HTTP_204_NO_CONTENT
-
