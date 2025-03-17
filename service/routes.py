@@ -177,7 +177,6 @@ def delete_items(shopcart_id, item_id):
 
     return "", status.HTTP_204_NO_CONTENT
 
-
 ######################################################################
 # UPDATE AN EXISTING SHOPCART
 ######################################################################
@@ -206,3 +205,43 @@ def update_shopcarts(shopcart_id):
 
     app.logger.info("Shopcart with ID: %d updated.", shopcart.id)
     return jsonify(shopcart.serialize()), status.HTTP_200_OK
+
+######################################################################
+# LIST ALL SHOPCARTS
+######################################################################
+@app.route("/shopcarts", methods=["GET"])
+def list_shopcarts():
+    """Returns all of the shopcarts"""
+    app.logger.info("Request for shopcart list")
+
+    shopcarts = []
+
+    # Parse any arguments from the query string
+    category = request.args.get("category")
+    name = request.args.get("name")
+    available = request.args.get("available")
+    gender = request.args.get("gender")
+
+    if category:
+        app.logger.info("Find by category: %s", category)
+        shopcarts = shopcart.find_by_category(category)
+    elif name:
+        app.logger.info("Find by name: %s", name)
+        shopcarts = shopcart.find_by_name(name)
+    elif available:
+        app.logger.info("Find by available: %s", available)
+        # create bool from string
+        available_value = available.lower() in ["true", "yes", "1"]
+        shopcarts = shopcart.find_by_availability(available_value)
+    elif gender:
+        app.logger.info("Find by gender: %s", gender)
+        # create enum from string
+        shopcarts = shopcart.find_by_gender(Gender[gender.upper()])
+    else:
+        app.logger.info("Find all")
+        shopcarts = shopcart.all()
+
+    results = [shopcart.serialize() for shopcart in shopcarts]
+    app.logger.info("Returning %d shopcarts", len(results))
+    return jsonify(results), status.HTTP_200_OK
+
