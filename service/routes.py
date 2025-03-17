@@ -44,7 +44,6 @@ def index():
 ######################################################################
 
 
-
 # ######################################################################
 # UPDATE AN EXISTING Shopcart
 ######################################################################
@@ -69,8 +68,10 @@ def update_items(item_id):
     Shopcart.update()
 
     return jsonify(Shopcart.serialize()), status.HTTP_200_OK
-=======
+
+
 ######################################################################
+
 
 # CREATE A NEW SHOPCART
 ######################################################################
@@ -95,7 +96,6 @@ def create_shopcart():
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
-
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
@@ -117,7 +117,9 @@ def check_content_type(content_type):
     abort(
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, f"Content-Type must be {content_type}"
     )
-=======
+
+
+######################################################################
 # CREATE A NEW ITEM IN SHOPCART
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>/items", methods=["POST"])
@@ -177,6 +179,30 @@ def delete_items(shopcart_id, item_id):
 
     return "", status.HTTP_204_NO_CONTENT
 
+
+######################################################################
+# READ A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
+def get_shopcarts(shopcart_id):
+    """
+    Retrieve a single Shopcart
+
+    This endpoint will return a Shopcart based on it's id
+    """
+    app.logger.info("Request to Retrieve a Shopcart with id [%s]", shopcart_id)
+
+    # Attempt to find the Shopcart and abort if not found
+    Shopcart = Shopcart.find(shopcart_id)
+    if not Shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' was not found.",
+        )
+
+    app.logger.info("Returning Shopcart: %s", Shopcart.name)
+    return jsonify(Shopcart.serialize()), status.HTTP_200_OK
+  
 ######################################################################
 # UPDATE AN EXISTING SHOPCART
 ######################################################################
