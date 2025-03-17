@@ -215,3 +215,23 @@ def list_shopcarts():
     results = [shopcart.serialize() for shopcart in shopcarts]
     app.logger.info("Returning %d shopcarts", len(results))
     return jsonify(results), status.HTTP_200_OK
+######################################################################
+# DELETE A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>", methods=["DELETE"])
+def delete_shopcarts(shopcart_id):
+    """
+    Delete a shopcart
+
+    This endpoint will delete a shopcart based the id specified in the path
+    """
+    app.logger.info("Request to Delete a shopcart with id [%s]", shopcart_id)
+
+    # Delete the shopcart if it exists
+    shopcart = shopcart.find(shopcart_id)
+    if shopcart:
+        app.logger.info("shopcart with ID: %d found.", shopcart.id)
+        shopcart.delete()
+
+    app.logger.info("shopcart with ID: %d delete complete.", shopcart_id)
+    return {}, status.HTTP_204_NO_CONTENT
