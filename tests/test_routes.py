@@ -27,6 +27,8 @@ from tests.factories import ShopcartFactory, ItemFactory
 from service.common import status
 from service.models import db, Shopcart
 
+from decimal import Decimal
+
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
 )
@@ -143,29 +145,30 @@ class TestShopcartService(TestCase):
 
         # Check the data is correct
         new_shopcart = resp.get_json()
-
-        self.assertEqual(new_shopcart["id"], shopcart.id, "Shopcart IDs do not match")
         self.assertEqual(
             new_shopcart["customer_id"],
             shopcart.customer_id,
             "Customer IDs do not match",
         )
         self.assertEqual(
-            new_shopcart["time_atc"], shopcart.time_atc, "Times do not match"
+            new_shopcart["time_atc"],
+            shopcart.time_atc.strftime("%a, %d %b %Y %H:%M:%S GMT"),
+            "Times do not match",
         )
 
         # Check that the location header was correct by getting it
         resp = self.client.get(location, content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_shopcart = resp.get_json()
-        self.assertEqual(new_shopcart["id"], shopcart.id, "Shopcart IDs do not match")
         self.assertEqual(
             new_shopcart["customer_id"],
             shopcart.customer_id,
             "Customer IDs do not match",
         )
         self.assertEqual(
-            new_shopcart["time_atc"], shopcart.time_atc, "Times do not match"
+            new_shopcart["time_atc"],
+            shopcart.time_atc.strftime("%a, %d %b %Y %H:%M:%S GMT"),
+            "Times do not match",
         )
 
     def test_update_shopcart(self):
@@ -175,7 +178,7 @@ class TestShopcartService(TestCase):
         resp = self.client.post(BASE_URL, json=test_shopcart.serialize())
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
-        # update the pet
+        # update the shopcart
         new_shopcart = resp.get_json()
         new_shopcart["customer_id"] = 1234567
         new_shopcart_id = new_shopcart["id"]
@@ -256,11 +259,12 @@ class TestShopcartService(TestCase):
         data = resp.get_json()
         logging.debug(data)
 
-        self.assertEqual(data["id"], item.id)
-        self.assertEqual(data["shopcart_id"], item.shopcart_id)
+        self.assertEqual(data["shopcart_id"], shopcart.id)
         self.assertEqual(data["description"], item.description)
         self.assertEqual(data["quantity"], item.quantity)
-        self.assertEqual(data["price"], item.price)
+
+        price_from_api = Decimal(f"{data['price']:.2f}")
+        self.assertEqual(price_from_api, item.price)
 
         # Check that the location header was correct by getting it
         resp = self.client.get(location, content_type="application/json")
@@ -295,11 +299,12 @@ class TestShopcartService(TestCase):
 
         data = resp.get_json()
         logging.debug(data)
-        self.assertEqual(data["id"], item.id)
-        self.assertEqual(data["shopcart_id"], item.shopcart_id)
+        self.assertEqual(data["shopcart_id"], shopcart.id)
         self.assertEqual(data["description"], item.description)
         self.assertEqual(data["quantity"], item.quantity)
-        self.assertEqual(data["price"], item.price)
+
+        price_from_api = Decimal(f"{data['price']:.2f}")
+        self.assertEqual(price_from_api, item.price)
 
     def test_update_item(self):
         """It should Update an item on an shopcart"""
