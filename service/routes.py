@@ -88,7 +88,7 @@ def update_items(item_id):
 # CREATE A NEW SHOPCART
 ######################################################################
 @app.route("/shopcarts", methods=["POST"])
-def create_shopcart():
+def create_shopcarts():
     """
     Creates a Shopcart
     This endpoint will create an Shopcart based the data in the body that is posted
@@ -98,14 +98,14 @@ def create_shopcart():
 
     # Create the shopcart
     shopcart = Shopcart()
+    app.logger.info("Processing: %s", request.get_json())
     shopcart.deserialize(request.get_json())
     shopcart.create()
+    app.logger.info("Shopcart with ID [%s] created", shopcart.id)
 
-    # Create a message to return
-    message = shopcart.serialize()
+    # Return the location of the new Shopcart
     location_url = url_for("get_shopcarts", shopcart_id=shopcart.id, _external=True)
-
-    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    return jsonify(shopcart.serialize()), status.HTTP_201_CREATED, {"Location": location_url}
 
 
 ######################################################################
