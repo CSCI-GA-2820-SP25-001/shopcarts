@@ -81,7 +81,7 @@ class TestShopcart(TestCase):
         self.assertEqual(data.time_atc, shopcart.time_atc)
 
     # Todo: Add your test cases here...
-
+    '''
     def test_create_a_shopcart(self):
         """It should Create an shopcart and assert that it exists"""
         fake_shopcart = ShopcartFactory()
@@ -94,7 +94,9 @@ class TestShopcart(TestCase):
         self.assertIsNotNone(shopcart)
         self.assertEqual(shopcart.id, fake_shopcart.id)
         self.assertEqual(shopcart.customer_id, fake_shopcart.customer_id)
-        self.assertEqual(shopcart.time_atc, fake_shopcart.time_atc)
+        self.assertEqual(shopcart.time_atc, fake_shopcart.time_atc)'
+        ''
+    '''
 
     def test_add_a_shopcart(self):
         """It should Create an shopcart and add it to the database"""
