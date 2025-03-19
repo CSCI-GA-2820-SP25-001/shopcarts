@@ -19,7 +19,7 @@ class ShopcartFactory(factory.Factory):
     id = factory.Sequence(lambda n: n)
     customer_id = factory.Sequence(lambda n: n)
 
-    time_atc = factory.Faker("date_time_between", start_date="-2y", end_date="now")
+    time_atc = factory.Faker("date_time")
 
     @post_generation
     def items(

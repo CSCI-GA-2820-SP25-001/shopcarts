@@ -25,9 +25,11 @@ class Shopcart(db.Model, PersistentBase):
     # Table Schema
     ##################################################
     id = db.Column(db.Integer, primary_key=True)
-    customer_id = db.Column(db.Integer)
+    customer_id = db.Column(db.Integer, nullable=False)
+    time_atc = db.Column(
+        db.DateTime, nullable=True, default=db.func.current_timestamp()
+    )
     items = db.relationship("Item", backref="shopcart", passive_deletes=True)
-    time_atc = db.Column(db.DateTime)
 
     def __repr__(self):
         return f"<Shopcart {self.customer_id} id=[{self.id}]>"
