@@ -135,26 +135,29 @@ def delete_shopcarts(shopcart_id):
 
 
 ######################################################################
-# LIST ALL SHOPCARTS
+# LIST ALL SHOPCARTS (W/ FILTERING)
 ######################################################################
 @app.route("/shopcarts", methods=["GET"])
 def list_shopcarts():
-    """Returns all of the shopcarts"""
+    """Returns all of the shopcarts, optionally filtered by customer_id or item name"""
     app.logger.info("Request for shopcart list")
 
-    shopcarts = []
+    customer_id = request.args.get("customer_id", type=int)
+    item_name = request.args.get("item_name", type=str)
 
-    # Process the query string if any
-    customer_id = request.args.get("customer_id")
+    shopcarts = Shopcart.all()
+
+    # Filter by customer_id
     if customer_id:
-        customer_id = int(customer_id)
-        shopcarts = Shopcart.find_by_customer(customer_id)
-    else:
-        shopcarts = Shopcart.all()
+        shopcarts = [sc for sc in shopcarts if sc.customer_id == customer_id]
 
-    # Return as an array of dictionaries
+    # Filter by item_name
+    if item_name:
+        shopcarts = [
+            sc for sc in shopcarts if any(item.name == item_name for item in sc.items)
+        ]
+
     results = [shopcart.serialize() for shopcart in shopcarts]
-
     return jsonify(results), status.HTTP_200_OK
 
 
@@ -283,6 +286,25 @@ def delete_items(shopcart_id, item_id):
 
 
 ######################################################################
+# DELETE ALL ITEMS IN A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items", methods=["DELETE"])
+def clear_items(shopcart_id):
+    """Clears all items in a shopcart"""
+    app.logger.info("Request to clear all items for shopcart with id: %s", shopcart_id)
+
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(status.HTTP_404_NOT_FOUND, f"Shopcart with id '{shopcart_id}' not found.")
+
+    # Delete all items from the shopcart
+    for item in list(shopcart.items):  # Make a copy to avoid modifying during iteration
+        item.delete()
+
+    return "", status.HTTP_204_NO_CONTENT
+
+
+######################################################################
 # READ AN ITEM FROM SHOPCART
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>/items/<int:item_id>", methods=["GET"])
@@ -308,14 +330,13 @@ def get_items(shopcart_id, item_id):
 
 
 ######################################################################
-# LIST ITEMS FROM SHOPCART
+# LIST ITEMS FROM SHOPCART (W/ FILTERING)
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>/items", methods=["GET"])
 def list_items(shopcart_id):
-    """Returns all of the items for a Shopping Cart"""
+    """Returns all of the items for a Shopping Cart, optionally filtered"""
     app.logger.info("Request for all items for shopcart with id: %s", shopcart_id)
 
-    # See if the shopcart exists and abort if it doesn't
     shopcart = Shopcart.find(shopcart_id)
     if not shopcart:
         abort(
@@ -323,9 +344,17 @@ def list_items(shopcart_id):
             f"Shopcart with id '{shopcart_id}' could not be found.",
         )
 
-    # Get the addresses for the account
-    results = [item.serialize() for item in shopcart.items]
+    items = shopcart.items
 
+    name = request.args.get("name")
+    quantity = request.args.get("quantity", type=int)
+
+    if name:
+        items = [i for i in items if i.name == name]
+    if quantity:
+        items = [i for i in items if i.quantity == quantity]
+
+    results = [item.serialize() for item in items]
     return jsonify(results), status.HTTP_200_OK
 
 
