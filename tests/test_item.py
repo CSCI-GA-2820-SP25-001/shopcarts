@@ -165,3 +165,25 @@ class TestItem(TestCase):
         self.assertEqual(new_item.description, item.description)
         self.assertEqual(new_item.quantity, item.quantity)
         self.assertEqual(new_item.price, item.price)
+
+    def test_delete_item_directly(self):
+        """It should delete an item using the model's delete()"""
+        item = ItemFactory()
+        item.create()
+        item_id = item.id
+        item.delete()
+        self.assertIsNone(Item.find(item_id))
+
+    def test_item_deserialize_return_type(self):
+        """It should return self when deserializing"""
+        item = Item()
+        result = item.deserialize(ItemFactory().serialize())
+        self.assertIs(result, item)
+
+    def test_delete_item_triggers_commit(self):
+        """It should commit when deleting an item"""
+        item = ItemFactory()
+        item.create()
+        item_id = item.id
+        item.delete()
+        self.assertIsNone(Item.find(item_id))

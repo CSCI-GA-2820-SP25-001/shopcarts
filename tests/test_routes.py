@@ -96,6 +96,14 @@ class TestShopcartService(TestCase):
         """It should call the Home Page"""
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertIn("/shopcarts", resp.get_json()["paths"])
+
+    def test_health_check(self):
+        """It should confirm the service is healthy"""
+        resp = self.client.get("/health")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["message"], "Healthy")
 
     def test_get_shopcart_list(self):
         """It should Get a list of shopcarts"""
@@ -212,6 +220,40 @@ class TestShopcartService(TestCase):
         resp = self.client.put(BASE_URL, json={"not": "today"})
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
+    def test_query_shopcarts_by_item_name(self):
+        """It should return shopcarts that have an item with a given name"""
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory(name="Bananas")
+        self.client.post(f"{BASE_URL}/{shopcart.id}/items", json=item.serialize())
+
+        resp = self.client.get(BASE_URL, query_string={"item_name": "Bananas"})
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertTrue(
+            any("Bananas" in [i["name"] for i in sc["items"]] for sc in data)
+        )
+
+    def test_query_shopcarts_by_customer_id(self):
+        """It should return shopcarts filtered by customer_id"""
+        shopcarts = self._create_shopcarts(3)
+        target_id = shopcarts[1].customer_id
+
+        resp = self.client.get(BASE_URL, query_string={"customer_id": target_id})
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertTrue(all(sc["customer_id"] == target_id for sc in data))
+        self.assertGreaterEqual(len(data), 1)
+
+    def test_create_shopcart_no_content_type(self):
+        """It should fail to create a shopcart with no content type"""
+        resp = self.client.post(BASE_URL, data="{}")  # no json= and no headers
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_create_shopcart_invalid_content_type(self):
+        """It should fail to create a shopcart with invalid content type"""
+        resp = self.client.post(BASE_URL, data="{}", content_type="text/plain")
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
     ######################################################################
     #  ITEM  T E S T   C A S E S
     ######################################################################
@@ -306,6 +348,12 @@ class TestShopcartService(TestCase):
         price_from_api = Decimal(f"{data['price']:.2f}")
         self.assertEqual(price_from_api, item.price)
 
+    def test_get_item_not_found(self):
+        """It should return 404 if item is not found"""
+        shopcart = self._create_shopcarts(1)[0]
+        resp = self.client.get(f"{BASE_URL}/{shopcart.id}/items/0")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_update_item(self):
         """It should Update an item on an shopcart"""
         # create a known item
@@ -371,3 +419,67 @@ class TestShopcartService(TestCase):
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_clear_all_items_in_shopcart(self):
+        """It should delete all items from a shopcart"""
+        shopcart = self._create_shopcarts(1)[0]
+
+        # Add two items
+        self.client.post(
+            f"{BASE_URL}/{shopcart.id}/items", json=ItemFactory().serialize()
+        )
+        self.client.post(
+            f"{BASE_URL}/{shopcart.id}/items", json=ItemFactory().serialize()
+        )
+
+        # Confirm 2 items present
+        resp = self.client.get(f"{BASE_URL}/{shopcart.id}/items")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 2)
+
+        # Clear all items
+        resp = self.client.delete(f"{BASE_URL}/{shopcart.id}/items")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Confirm 0 items
+        resp = self.client.get(f"{BASE_URL}/{shopcart.id}/items")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 0)
+
+    def test_clear_items_shopcart_not_found(self):
+        """It should fail to clear items from non-existent shopcart"""
+        resp = self.client.delete(f"{BASE_URL}/0/items")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_query_items_by_name(self):
+        """It should return items filtered by name"""
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory(name="Milk")
+        self.client.post(f"{BASE_URL}/{shopcart.id}/items", json=item.serialize())
+
+        resp = self.client.get(
+            f"{BASE_URL}/{shopcart.id}/items", query_string={"name": "Milk"}
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertTrue(all(i["name"] == "Milk" for i in data))
+
+    def test_query_items_by_quantity(self):
+        """It should return items filtered by quantity"""
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory(quantity=7)
+        self.client.post(
+            f"{BASE_URL}/{shopcart.id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+
+        resp = self.client.get(
+            f"{BASE_URL}/{shopcart.id}/items", query_string={"quantity": 7}
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertTrue(all(i["quantity"] == 7 for i in data))
+        self.assertGreaterEqual(len(data), 1)

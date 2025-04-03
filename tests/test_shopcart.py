@@ -245,3 +245,9 @@ class TestShopcart(TestCase):
         """It should not Deserialize an item with a TypeError"""
         item = Item()
         self.assertRaises(DataValidationError, item.deserialize, [])
+
+    def test_deserialize_returns_self(self):
+        """It should return self from deserialize"""
+        shopcart = Shopcart()
+        result = shopcart.deserialize(ShopcartFactory().serialize())
+        self.assertIs(result, shopcart)
