@@ -1,3 +1,9 @@
+
+# lab-github-actions
+
+[![Build Status](https://github.com/emjduff/lab-github-actions/actions/workflows/ci.yml/badge.svg)](https://github.com/emjduff/lab-github-actions/actions)
+[![codecov](https://codecov.io/gh/emjduff/lab-github-actions/branch/master/graph/badge.svg)](https://codecov.io/gh/emjduff/lab-github-actions)
+
 # NYU DevOps Project Template
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
