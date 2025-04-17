@@ -6,7 +6,7 @@ services:
   app:
     build:
       context: ..
-      dockerfile: .devcontainer/Dockerfile    
+      dockerfile: .devcontainer/Dockerfile
     hostname: nyu
     container_name: nyu-project
     volumes:
@@ -27,7 +27,7 @@ services:
     image: postgres:15-alpine
     # Uncomment ports to access database from your computer (optional)
     ports:
-       - 5432:5432
+      - 5432:5432
     environment:
       POSTGRES_PASSWORD: pgs3cr3t
     volumes:
@@ -37,6 +37,7 @@ services:
 
 volumes:
   postgres:
+
 
 networks:
   dev:
