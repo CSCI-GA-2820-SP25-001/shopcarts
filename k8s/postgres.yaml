@@ -37,7 +37,7 @@ spec:
               cpu: "0.50"
               memory: "256Mi"
             requests:
-              cpu: "0.25"        
+              cpu: "0.25"
               memory: "128Mi"
       volumes:
         - name: postgres-storage
@@ -70,4 +70,3 @@ spec:
       targetPort: 5432
   selector:
     app: postgres
-
