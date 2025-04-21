@@ -18,6 +18,12 @@ Feature: The shopcarts service back-end
         When I visit the "Home Page"
         Then I should see "Shopcarts REST API Service" in the title
         And I should not see "404 Not Found"
+
+    Scenario: Delete a Shopcart
+        Given a shopcart exists with "id" of "1"
+        When I delete the shopcart with "id" of "1"
+        Then I should see the message "Success"
+        And the shopcart with "id" of "1" should no longer exist
     '''
     Scenario: Create a Shopcart
         When I visit the "Home Page"
@@ -41,11 +47,7 @@ Feature: The shopcarts service back-end
         Then I should see the message "Success"
         And I should see the "Customer ID" as "10"
 
-    Scenario: Delete a Shopcart
-        Given a shopcart exists with "Customer ID" of "1"
-        When I delete the shopcart with "Id" of "1"
-        Then I should see the message "Success"
-        And the shopcart with "Id" of "1" should no longer exist
+
 
     Scenario: List all Shopcarts
         When I retrieve all shopcarts
