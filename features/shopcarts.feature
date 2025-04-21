@@ -13,17 +13,19 @@ Feature: The shopcarts service back-end
             | 1       | Milk   | 2        | 3.50  | Fresh milk carton |
             | 2       | Bread  | 1        | 2.00  | Whole grain loaf  |
             | 3       | Apples | 5        | 1.20  | Red apples pack   |
-
+  
     Scenario: The server is running
-        When I visit the "Home Page"
-        Then I should see "Shopcarts REST API Service" in the title
-        And I should not see "404 Not Found"
+    When I visit the "Home Page"
+    Then I should see "Shopcart Demo REST API Service" in the title
+    And I should not see "404 Not Found"
+
 
     Scenario: Delete a Shopcart
-        Given a shopcart exists with "id" of "1"
-        When I delete the shopcart with "id" of "1"
+        When I visit the "Home Page"
+        And I set the "id" to "1"
+        And I press the "Delete" button
         Then I should see the message "Success"
-        And the shopcart with "id" of "1" should no longer exist
+        And I should not see "1" in the results
     '''
     Scenario: Create a Shopcart
         When I visit the "Home Page"
