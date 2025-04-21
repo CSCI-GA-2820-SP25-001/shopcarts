@@ -6,25 +6,25 @@ $(function () {
 
     // Updates the form with data from the response
     function update_form_data(res) {
-        $("#pet_id").val(res.id);
-        $("#pet_name").val(res.name);
-        $("#pet_category").val(res.category);
+        $("#shopcart_id").val(res.id);
+        $("#shopcart_name").val(res.name);
+        $("#shopcart_category").val(res.category);
         if (res.available == true) {
-            $("#pet_available").val("true");
+            $("#shopcart_available").val("true");
         } else {
-            $("#pet_available").val("false");
+            $("#shopcart_available").val("false");
         }
-        $("#pet_gender").val(res.gender);
-        $("#pet_birthday").val(res.birthday);
+        $("#shopcart_gender").val(res.gender);
+        $("#shopcart_birthday").val(res.birthday);
     }
 
     /// Clears all form fields
     function clear_form_data() {
-        $("#pet_name").val("");
-        $("#pet_category").val("");
-        $("#pet_available").val("");
-        $("#pet_gender").val("");
-        $("#pet_birthday").val("");
+        $("#shopcart_name").val("");
+        $("#shopcart_category").val("");
+        $("#shopcart_available").val("");
+        $("#shopcart_gender").val("");
+        $("#shopcart_birthday").val("");
     }
 
     // Updates the flash message area
@@ -34,16 +34,16 @@ $(function () {
     }
 
     // ****************************************
-    // Create a Pet
+    // Create a Shopcart
     // ****************************************
 
     $("#create-btn").click(function () {
 
-        let name = $("#pet_name").val();
-        let category = $("#pet_category").val();
-        let available = $("#pet_available").val() == "true";
-        let gender = $("#pet_gender").val();
-        let birthday = $("#pet_birthday").val();
+        let name = $("#shopcart_name").val();
+        let category = $("#shopcart_category").val();
+        let available = $("#shopcart_available").val() == "true";
+        let gender = $("#shopcart_gender").val();
+        let birthday = $("#shopcart_birthday").val();
 
         let data = {
             "name": name,
@@ -57,7 +57,7 @@ $(function () {
         
         let ajax = $.ajax({
             type: "POST",
-            url: "/pets",
+            url: "/shopcarts",
             contentType: "application/json",
             data: JSON.stringify(data),
         });
@@ -74,17 +74,17 @@ $(function () {
 
 
     // ****************************************
-    // Update a Pet
+    // Update a Shopcart
     // ****************************************
 
     $("#update-btn").click(function () {
 
-        let pet_id = $("#pet_id").val();
-        let name = $("#pet_name").val();
-        let category = $("#pet_category").val();
-        let available = $("#pet_available").val() == "true";
-        let gender = $("#pet_gender").val();
-        let birthday = $("#pet_birthday").val();
+        let shopcart_id = $("#shopcart_id").val();
+        let name = $("#shopcart_name").val();
+        let category = $("#shopcart_category").val();
+        let available = $("#shopcart_available").val() == "true";
+        let gender = $("#shopcart_gender").val();
+        let birthday = $("#shopcart_birthday").val();
 
         let data = {
             "name": name,
@@ -98,7 +98,7 @@ $(function () {
 
         let ajax = $.ajax({
                 type: "PUT",
-                url: `/pets/${pet_id}`,
+                url: `/shopcarts/${shopcart_id}`,
                 contentType: "application/json",
                 data: JSON.stringify(data)
             })
@@ -115,18 +115,18 @@ $(function () {
     });
 
     // ****************************************
-    // Retrieve a Pet
+    // Retrieve a Shopcart
     // ****************************************
 
     $("#retrieve-btn").click(function () {
 
-        let pet_id = $("#pet_id").val();
+        let shopcart_id = $("#shopcart_id").val();
 
         $("#flash_message").empty();
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/pets/${pet_id}`,
+            url: `/shopcarts/${shopcart_id}`,
             contentType: "application/json",
             data: ''
         })
@@ -145,25 +145,25 @@ $(function () {
     });
 
     // ****************************************
-    // Delete a Pet
+    // Delete a Shopcart
     // ****************************************
 
     $("#delete-btn").click(function () {
 
-        let pet_id = $("#pet_id").val();
+        let shopcart_id = $("#shopcart_id").val();
 
         $("#flash_message").empty();
 
         let ajax = $.ajax({
             type: "DELETE",
-            url: `/pets/${pet_id}`,
+            url: `/shopcarts/${shopcart_id}`,
             contentType: "application/json",
             data: '',
         })
 
         ajax.done(function(res){
             clear_form_data()
-            flash_message("Pet has been Deleted!")
+            flash_message("Shopcart has been Deleted!")
         });
 
         ajax.fail(function(res){
@@ -176,20 +176,20 @@ $(function () {
     // ****************************************
 
     $("#clear-btn").click(function () {
-        $("#pet_id").val("");
+        $("#shopcart_id").val("");
         $("#flash_message").empty();
         clear_form_data()
     });
 
     // ****************************************
-    // Search for a Pet
+    // Search for a Shopcart
     // ****************************************
 
     $("#search-btn").click(function () {
 
-        let name = $("#pet_name").val();
-        let category = $("#pet_category").val();
-        let available = $("#pet_available").val() == "true";
+        let name = $("#shopcart_name").val();
+        let category = $("#shopcart_category").val();
+        let available = $("#shopcart_available").val() == "true";
 
         let queryString = ""
 
@@ -215,7 +215,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/pets?${queryString}`,
+            url: `/shopcarts?${queryString}`,
             contentType: "application/json",
             data: ''
         })
@@ -232,20 +232,20 @@ $(function () {
             table += '<th class="col-md-2">Gender</th>'
             table += '<th class="col-md-2">Birthday</th>'
             table += '</tr></thead><tbody>'
-            let firstPet = "";
+            let firstShopcart = "";
             for(let i = 0; i < res.length; i++) {
-                let pet = res[i];
-                table +=  `<tr id="row_${i}"><td>${pet.id}</td><td>${pet.name}</td><td>${pet.category}</td><td>${pet.available}</td><td>${pet.gender}</td><td>${pet.birthday}</td></tr>`;
+                let shopcart = res[i];
+                table +=  `<tr id="row_${i}"><td>${shopcart.id}</td><td>${shopcart.name}</td><td>${shopcart.category}</td><td>${shopcart.available}</td><td>${shopcart.gender}</td><td>${shopcart.birthday}</td></tr>`;
                 if (i == 0) {
-                    firstPet = pet;
+                    firstShopcart = shopcart;
                 }
             }
             table += '</tbody></table>';
             $("#search_results").append(table);
 
             // copy the first result to the form
-            if (firstPet != "") {
-                update_form_data(firstPet)
+            if (firstShopcart != "") {
+                update_form_data(firstShopcart)
             }
 
             flash_message("Success")

@@ -15,16 +15,16 @@ Feature: The shopcarts service back-end
             | 3       | Apples | 5        | 1.20  | Red apples pack   |
   
     Scenario: The server is running
-    When I visit the "Home Page"
-    Then I should see "Shopcart Demo REST API Service" in the title
-    And I should not see "404 Not Found"
+        When I visit the "Home Page"
+        Then I should see "Shopcart Demo RESTful Service" in the title
+        And I should not see "404 Not Found"
 
 
     Scenario: Delete a Shopcart
         When I visit the "Home Page"
-        And I set the "id" to "1"
+        And I set the "ID" to "1"
         And I press the "Delete" button
-        Then I should see the message "Success"
+        Then I should see the message "Shopcart has been Deleted!"
         And I should not see "1" in the results
     '''
     Scenario: Create a Shopcart
