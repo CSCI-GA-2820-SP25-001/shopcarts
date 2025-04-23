@@ -19,13 +19,23 @@ Feature: The shopcarts service back-end
         Then I should see "Shopcart Demo RESTful Service" in the title
         And I should not see "404 Not Found"
 
+    Scenario: Retrieve a Shopcart
+        When I visit the "Home Page"
+        And I set the "ID" to "1"
+        And I press the "Retrieve" button
+        Then I should see "Milk" in the results
+        And I should see "2" in the results
 
+        
     Scenario: Delete a Shopcart
         When I visit the "Home Page"
         And I set the "ID" to "1"
         And I press the "Delete" button
         Then I should see the message "Shopcart has been Deleted!"
-        And I should not see "1" in the results
+        And I should not see "1"
+
+
+  
     '''
     Scenario: Create a Shopcart
         When I visit the "Home Page"
@@ -37,11 +47,7 @@ Feature: The shopcarts service back-end
         Then the "Id" field should be empty
         And the "Customer ID" field should be empty
 
-    Scenario: Retrieve a Shopcart
-        Given a shopcart exists with "Customer ID" of "1"
-        When I retrieve the shopcart with "Id" of "1"
-        Then I should see the "Customer ID" as "1"
-        And I should see the "Time Atc" as "2023-10-01T10:00Z"
+
 
     Scenario: Update a Shopcart
         Given a shopcart exists with "Customer ID" of "1"
