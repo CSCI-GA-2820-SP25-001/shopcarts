@@ -9,6 +9,14 @@ $(function () {
         $("#flash_message").empty();
         $("#flash_message").append(message);
     }
+// Updates the form with data from the response
+    function update_form_data(res) {
+        $("#item_id").val(res.id);
+        $("#name").val(res.name);
+        $("#quantity").val(res.quantity);
+        $("price").val(res.price);
+        $("description").val(res.description);
+    }
 
     // Function to clear the form
     function clear_form_data() {
@@ -22,11 +30,19 @@ $(function () {
         $("#shopcart_find_customer tbody").empty();
     }
 
-    // Function to update form data with fetched shopcart
-    function update_form_data(data) {
-        $("#shopcart_id").val(data.id);
-        // Populate other fields as needed
+    // Function to update form with the first item from search results
+    function update_form_with_first_item(items) {
+        if (items && items.length > 0) {
+            let item = items[0];
+            $("#item_id").val(item.id || "");
+            $("#name").val(item.name || "");
+            $("#quantity").val(item.quantity || "");
+            $("#price").val(item.price || "");
+            $("#description").val(item.description || "");
+        }
     }
+
+
 
     // ****************************************
     // Clear the form
@@ -240,6 +256,9 @@ $(function () {
                             <td>${item.description || ""}</td>
                         </tr>`;
                     }
+                    
+                    // Update form with first item's data
+                    update_form_with_first_item(res.items);
                 } else {
                     // Handle case where the shopcart has no items
                     table += `<tr><td colspan="5">No items found in this shopcart.</td></tr>`;
@@ -264,7 +283,7 @@ $(function () {
 
     });
 
-})
+
 
 
 
@@ -293,7 +312,7 @@ $(function () {
                         let row = `<tr><td>${res[i].id}</td><td>${res[i].customer_id}</td></tr>`;
                         tableBody.append(row);
                     }
-                    flash_message(res.responseJSON ? res.responseJSON.message : "Success");
+                    flash_message("Success");
                 } else {
                     tableBody.append('<tr><td colspan="2">No shopcarts found</td></tr>');
                     flash_message(res.responseJSON ? res.responseJSON.message : "No shopcarts found");
@@ -309,3 +328,4 @@ $(function () {
     });
 
 
+});

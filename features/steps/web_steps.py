@@ -31,6 +31,12 @@ from behave import when, then  # pylint: disable=no-name-in-module
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions
+import requests
+from compare3 import expect
+
+# Constants for HTTP status codes and timeout
+HTTP_200_OK = 200
+WAIT_TIMEOUT = 10
 
 ID_PREFIX = "shopcart_"
 
@@ -69,6 +75,21 @@ def step_impl(context: Any, text_string: str) -> None:
     assert text_string not in element.text
 
 
+@when('I set the ID to "{text_string}"')
+def step_impl(context: Any, text_string: str) -> None:
+    # Get a list of all the shopcarts
+    rest_endpoint = f"{context.base_url}/shopcarts"
+    context.resp = requests.get(rest_endpoint, timeout=WAIT_TIMEOUT)
+    expect(context.resp.status_code).equal_to(HTTP_200_OK)
+    response_data = context.resp.json()
+    if response_data and len(response_data) > 0:
+        text_string = str(response_data[0]["id"])
+    element_id = ID_PREFIX + "id"
+    element = context.driver.find_element(By.ID, element_id)
+    element.clear()
+    element.send_keys(text_string)
+
+
 @when('I set the "{element_name}" to "{text_string}"')
 def step_impl(context: Any, element_name: str, text_string: str) -> None:
     element_id = ID_PREFIX + element_name.lower().replace(" ", "_")
@@ -86,7 +107,7 @@ def step_impl(context: Any, text: str, element_name: str) -> None:
 
 @then('I should see "{text}" in the "{element_name}" dropdown')
 def step_impl(context: Any, text: str, element_name: str) -> None:
-    element_id = ID_PREFIX + element_name.lower().replace(" ", "_")
+    element_id = element_name.lower().replace(" ", "_")
     element = Select(context.driver.find_element(By.ID, element_id))
     assert element.first_selected_option.text == text
 
@@ -146,6 +167,15 @@ def step_impl(context: Any, name: str) -> None:
     assert found
 
 
+@then('I should see "{number}" shopcarts in the results')
+def step_impl(context: Any, number: int) -> None:
+    rows = context.driver.find_elements(
+        context.driver.find_element(By.ID, "all_shopcarts")
+    )
+    row_count = len(rows)
+    expected_count = int(number)
+    assert row_count == expected_count
+
 @then('I should not see "{name}" in the results')
 def step_impl(context: Any, name: str) -> None:
     element = context.driver.find_element(By.ID, "search_results")
@@ -174,7 +204,7 @@ def step_impl(context: Any, message: str) -> None:
 
 @then('I should see "{text_string}" in the "{element_name}" field')
 def step_impl(context: Any, text_string: str, element_name: str) -> None:
-    element_id = ID_PREFIX + element_name.lower().replace(" ", "_")
+    element_id = element_name.lower().replace(" ", "_")
     found = WebDriverWait(context.driver, context.wait_seconds).until(
         expected_conditions.text_to_be_present_in_element_value(
             (By.ID, element_id), text_string

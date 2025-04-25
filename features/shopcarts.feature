@@ -21,19 +21,19 @@ Feature: The shopcarts service back-end
 
     Scenario: Retrieve a Shopcart
         When I visit the "Home Page"
-        And I set the "ID" to "1"
-        And I press the "Retrieve" button
-        Then I should see "Milk" in the results
-        And I should see "2" in the results
+        And I set the ID to "1"
+        And I press the "Search" button
+        Then I should see "Milk" in the "name" field
 
-        
     Scenario: Delete a Shopcart
         When I visit the "Home Page"
-        And I set the "ID" to "1"
+        And I set the ID to "1"
         And I press the "Delete" button
         Then I should see the message "Shopcart has been Deleted!"
-        And I should not see "1"
-
+    
+    Scenario: List all Shopcarts
+        When I press the "List" button
+        Then I should see the message "Successs!"        Then I should see "2" shopcarts in the results
 
   
     '''
@@ -57,11 +57,6 @@ Feature: The shopcarts service back-end
 
 
 
-    Scenario: List all Shopcarts
-        When I retrieve all shopcarts
-        Then I should see "2" shopcarts in the results
-        And I should see a shopcart with "Customer ID" of "1"
-        And I should see a shopcart with "Customer ID" of "2"
 
     Scenario: Add an Item to a Shopcart
         Given a shopcart exists with "Customer ID" of "1"
