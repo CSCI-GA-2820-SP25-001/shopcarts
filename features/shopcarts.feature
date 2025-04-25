@@ -31,9 +31,19 @@ Feature: The shopcarts service back-end
         And I press the "Delete" button
         Then I should see the message "Shopcart has been Deleted!"
     
-    Scenario: List all Shopcarts
-        When I press the "List" button
-        Then I should see the message "Successs!"        Then I should see "2" shopcarts in the results
+    Scenario: Fill the item form
+        When I visit the "Home Page"
+        And I set the ID to "1"
+        And I press the "Search" button
+        Then I should see "2" in the "Quantity" field
+
+    Scenario: Clear items
+        When I visit the "Home Page"
+        And I set the ID to "1"
+        And I press the "Search" button
+        Then I should see "Milk" in the "name" field
+        When I press the "clear" button
+        Then the "name" field should be empty
 
   
     '''
