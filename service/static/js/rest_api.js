@@ -1,44 +1,41 @@
 $(function () {
 
     // ****************************************
-    //  U T I L I T Y   F U N C T I O N S - UPDATED
+    //  U T I L I T Y   F U N C T I O N S - NEED TO ADJUST TO HAVE FUNCTION FOR CLEARING FORM INPUTS
     // ****************************************
 
-    // Updates the form with data from the response
-    function update_form_data(res) {
-        $("#customer_id").val(res.customer_id || "");
-            }
-
-    // Clears all form fields
-   function clear_form_data() {
-        $("#customer_id").val("");
-    }
 
 
-    // Updates the flash message area
-    function flash_message(message) {
-        $("#flash_message").empty();
-        $("#flash_message").append(message);
-    }
+    // $("#clear-btn").click(function () {
+    //     $("#shopcart_id").val("");
+    //     $("#customer_id").val('');
+    //     $("#item_id").val('');
+    //     $("#name").val('');
+    //     $("#quantity").val('');
+    //     $("#price").val('');
+    //     $("#description").val('');
+    //     $("#flash_message").empty();
+    //     clear_form_data();
+    // });
 
+
+
+
+
+    
     // ****************************************
-    // Create a Shopcart
+    // Create a Shopcart - UPDATED
     // ****************************************
 
     $("#create-btn").click(function () {
 
-        let name = $("#shopcart_name").val();
-        let category = $("#shopcart_category").val();
-        let available = $("#shopcart_available").val() == "true";
-        let gender = $("#shopcart_gender").val();
-        let birthday = $("#shopcart_birthday").val();
+        let id = $("#shopcart_id").val();
+        let customer_id = $("#shopcart_customer_id").val();
+ 
 
         let data = {
-            "name": name,
-            "category": category,
-            "available": available,
-            "gender": gender,
-            "birthday": birthday
+            "id": id,
+            "customer_id": customer_id,
         };
 
         $("#flash_message").empty();
@@ -62,74 +59,74 @@ $(function () {
 
 
     // ****************************************
-    // Update a Shopcart
+    // Update a Shopcart - NEEDS UPDATE - SHOULD  WE REPURPOSE TO UPDATE ITEMS BASED ON FORM?
     // ****************************************
 
-    $("#update-btn").click(function () {
+    // $("#update-btn").click(function () {
 
-        let shopcart_id = $("#shopcart_id").val();
-        let name = $("#shopcart_name").val();
-        let category = $("#shopcart_category").val();
-        let available = $("#shopcart_available").val() == "true";
-        let gender = $("#shopcart_gender").val();
-        let birthday = $("#shopcart_birthday").val();
+    //     let shopcart_id = $("#shopcart_id").val();
+    //     let name = $("#shopcart_name").val();
+    //     let category = $("#shopcart_category").val();
+    //     let available = $("#shopcart_available").val() == "true";
+    //     let gender = $("#shopcart_gender").val();
+    //     let birthday = $("#shopcart_birthday").val();
 
-        let data = {
-            "name": name,
-            "category": category,
-            "available": available,
-            "gender": gender,
-            "birthday": birthday
-        };
+    //     let data = {
+    //         "name": name,
+    //         "category": category,
+    //         "available": available,
+    //         "gender": gender,
+    //         "birthday": birthday
+    //     };
 
-        $("#flash_message").empty();
+    //     $("#flash_message").empty();
 
-        let ajax = $.ajax({
-                type: "PUT",
-                url: `/shopcarts/${shopcart_id}`,
-                contentType: "application/json",
-                data: JSON.stringify(data)
-            })
+    //     let ajax = $.ajax({
+    //             type: "PUT",
+    //             url: `/shopcarts/${shopcart_id}`,
+    //             contentType: "application/json",
+    //             data: JSON.stringify(data)
+    //         })
 
-        ajax.done(function(res){
-            update_form_data(res)
-            flash_message("Success")
-        });
+    //     ajax.done(function(res){
+    //         update_form_data(res)
+    //         flash_message("Success")
+    //     });
 
-        ajax.fail(function(res){
-            flash_message(res.responseJSON.message)
-        });
+    //     ajax.fail(function(res){
+    //         flash_message(res.responseJSON.message)
+    //     });
 
-    });
+    // });
 
     // ****************************************
-    // Retrieve a Shopcart - UPDATED
+    // Retrieve a Shopcart - INCORPORATED INTO SEARCH - NO CHANGES NEEDED
     // ****************************************
 
-    $("#retrieve-btn").click(function () {
-        let shopcart_id = $("#shopcart_id").val();
+    // $("#retrieve-btn").click(function () {
+    //     let shopcart_id = $("#shopcart_id").val();
         
-        $("#flash_message").empty();
-        console.log("Retrieving shopcart with ID:", shopcart_id);
+    //     $("#flash_message").empty();
+    //     console.log("Retrieving shopcart with ID:", shopcart_id);
         
-        let ajax = $.ajax({
-            type: "GET",
-            url: `/shopcarts/${shopcart_id}`,
-            contentType: "application/json",
-            data: ''
-        })
+    //     let ajax = $.ajax({
+    //         type: "GET",
+    //         url: `/shopcarts/${shopcart_id}`,
+    //         contentType: "application/json",
+    //         data: ''
+    //     })
 
-        ajax.done(function(res){
-            console.log("Success retrieving shopcart:", res);
-            update_form_data(res);
-            flash_message("Success");
-        });
+    //     ajax.done(function(res){
+    //         console.log("Success retrieving shopcart:", res);
+    //         update_form_data(res);
+    //         flash_message("Success");
+    //     });
 
-        ajax.fail(function(res){
-            clear_form_data();
-            flash_message(res.responseJSON.message);
-        });
-    });
+    //     ajax.fail(function(res){
+    //         clear_form_data();
+    //         flash_message(res.responseJSON.message);
+    //     });
+    // });
 
     // ****************************************
     // Delete a Shopcart - UPDATED
@@ -161,21 +158,6 @@ $(function () {
     
 
 
-    // ****************************************
-    // Clear the form - UPDATED
-    // ****************************************
-
-    $("#clear-btn").click(function () {
-        $("#shopcart_id").val("");
-        $("#customer_id").val('');
-        $("#item_id").val('');
-        $("#name").val('');
-        $("#quantity").val('');
-        $("#price").val('');
-        $("#description").val('');
-        $("#flash_message").empty();
-        clear_form_data();
-    });
 
     // ****************************************
     // Search for all Shopcarts - UPDATED
