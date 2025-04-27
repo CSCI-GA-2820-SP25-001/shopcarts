@@ -4,24 +4,63 @@ $(function () {
     //  U T I L I T Y   F U N C T I O N S - NEED TO ADJUST TO HAVE FUNCTION FOR CLEARING FORM INPUTS
     // ****************************************
 
+    // Function to display the flash message
+    function flash_message(message) {
+        $("#flash_message").empty();
+        $("#flash_message").append(message);
+    }
+// Updates the form with data from the response
+    function update_form_data(res) {
+        $("#item_id").val(res.id);
+        $("#name").val(res.name);
+        $("#quantity").val(res.quantity);
+        $("price").val(res.price);
+        $("description").val(res.description);
+    }
+
+    // Function to clear the form
+    function clear_form_data() {
+        $("#shopcart_id").val("");
+        $("#item_id").val("");
+        $("#name").val("");
+        $("#quantity").val("");
+        $("#price").val("");
+        $("#description").val("");
+        $("#shopcart_find_results").empty();
+        $("#shopcart_find_customer tbody").empty();
+    }
+
+    // Function to update form with the first item from search results
+    function update_form_with_first_item(items) {
+        if (items && items.length > 0) {
+            let item = items[0];
+            $("#item_id").val(item.id || "");
+            $("#name").val(item.name || "");
+            $("#quantity").val(item.quantity || "");
+            $("#price").val(item.price || "");
+            $("#description").val(item.description || "");
+        }
+    }
 
 
-    // $("#clear-btn").click(function () {
-    //     $("#shopcart_id").val("");
-    //     $("#customer_id").val('');
-    //     $("#item_id").val('');
-    //     $("#name").val('');
-    //     $("#quantity").val('');
-    //     $("#price").val('');
-    //     $("#description").val('');
-    //     $("#flash_message").empty();
-    //     clear_form_data();
-    // });
 
+    // ****************************************
+    // Clear the form
+    // ****************************************
 
-
-
-
+    $("#clear-btn").click(function () {
+        $("#shopcart_id").val("");
+        $("#shopcart_customer_id").val("");
+        $("#item_id").val("");
+        $("#name").val("");
+        $("#quantity").val("");
+        $("#price").val("");
+        $("#description").val("");
+        $("#flash_message").empty();
+        $("#shopcart_find_results").empty();
+        $("#shopcart_find_customer tbody").empty();
+        clear_form_data();
+    });
     
     // ****************************************
     // Create a Shopcart - UPDATED
@@ -217,6 +256,9 @@ $(function () {
                             <td>${item.description || ""}</td>
                         </tr>`;
                     }
+                    
+                    // Update form with first item's data
+                    update_form_with_first_item(res.items);
                 } else {
                     // Handle case where the shopcart has no items
                     table += `<tr><td colspan="5">No items found in this shopcart.</td></tr>`;
@@ -241,4 +283,49 @@ $(function () {
 
     });
 
-})
+
+
+
+
+
+    // ****************************************
+    // LIST ALL SHOPCARTS
+    // ****************************************
+
+    $("#list-btn").click(function () {
+        $("#existing_carts tbody").empty(); // Clear previous results
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "GET",
+            url: "/shopcarts",
+            contentType: "application/json",
+            data: ''
+        });
+
+        ajax.done(function(res){
+            if (Array.isArray(res)) {
+                let tableBody = $("#existing_carts tbody");
+                
+                if (res.length > 0) {
+                    for (let i = 0; i < res.length; i++) {
+                        let row = `<tr><td>${res[i].id}</td><td>${res[i].customer_id}</td></tr>`;
+                        tableBody.append(row);
+                    }
+                    flash_message("Success");
+                } else {
+                    tableBody.append('<tr><td colspan="2">No shopcarts found</td></tr>');
+                    flash_message(res.responseJSON ? res.responseJSON.message : "No shopcarts found");
+                }
+            } else {
+                flash_message(res.responseJSON ? res.responseJSON.message : "Unexpected response format");
+            }
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON ? res.responseJSON.message : "Error listing shopcarts");
+        });
+    });
+
+
+});
