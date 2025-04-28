@@ -31,6 +31,7 @@ from behave import when, then  # pylint: disable=no-name-in-module
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 import requests
 from compare3 import expect
 
@@ -132,41 +133,12 @@ def step_impl(context: Any, text: str) -> None:
         assert True
 
 
-@when('I set the ID to "{text_string}"')
-def step_impl(context: Any, text_string: str) -> None:
-    # Get a list of all the shopcarts
-    rest_endpoint = f"{context.base_url}/shopcarts"
-    context.resp = requests.get(rest_endpoint, timeout=WAIT_TIMEOUT)
-    expect(context.resp.status_code).equal_to(HTTP_200_OK)
-    response_data = context.resp.json()
-    if response_data and len(response_data) > 0:
-        text_string = str(response_data[0]["id"])
-    element_id = "shopcart_id"
-    element = context.driver.find_element(By.ID, element_id)
-    element.clear()
-    element.send_keys(text_string)
-
-
 @when('I set the "{element_name}" to "{text_string}"')
 def step_impl(context: Any, element_name: str, text_string: str) -> None:
     element_id = element_name.lower().replace(" ", "_")
     element = context.driver.find_element(By.ID, element_id)
     element.clear()
     element.send_keys(text_string)
-
-
-@when('I select "{text}" in the "{element_name}" dropdown')
-def step_impl(context: Any, text: str, element_name: str) -> None:
-    element_id = element_name.lower().replace(" ", "_")
-    element = Select(context.driver.find_element(By.ID, element_id))
-    element.select_by_visible_text(text)
-
-
-@then('I should see "{text}" in the "{element_name}" dropdown')
-def step_impl(context: Any, text: str, element_name: str) -> None:
-    element_id = element_name.lower().replace(" ", "_")
-    element = Select(context.driver.find_element(By.ID, element_id))
-    assert element.first_selected_option.text == text
 
 
 @then('the "{element_name}" field should be empty')
@@ -234,8 +206,6 @@ def step_impl(context: Any, number: str) -> None:
 
 @then('I should see the message "{message}"')
 def step_impl(context: Any, message: str) -> None:
-    # Uncomment next line to take a screenshot of the web page for debugging
-    # save_screenshot(context, message)
     found = WebDriverWait(context.driver, context.wait_seconds).until(
         expected_conditions.text_to_be_present_in_element(
             (By.ID, "flash_message"), message
@@ -272,18 +242,23 @@ def step_impl(context: Any, element_name: str, text_string: str) -> None:
     element.clear()
     element.send_keys(text_string)
 
+
 @when('I clear the "{element_name}" field')
 def step_impl(context, element_name):
     element_id = element_name.lower().replace(" ", "_")
     element = context.driver.find_element(By.ID, element_id)
     element.clear()
 
+
 @then('the "{element_name}" field should not be "{text_string}"')
 def step_impl(context, element_name, text_string):
     element_id = element_name.lower().replace(" ", "_")
     element = context.driver.find_element(By.ID, element_id)
     actual_value = element.get_attribute("value")
-    assert actual_value != text_string, f"Expected {element_name} not to be '{text_string}', but it was."
+    assert (
+        actual_value != text_string
+    ), f"Expected {element_name} not to be '{text_string}', but it was."
+
 
 @then('the "{element_name}" field should not be empty')
 def step_impl(context, element_name):
