@@ -174,34 +174,6 @@ $(function () {
 
     // });
 
-    // ****************************************
-    // Retrieve a Shopcart - INCORPORATED INTO SEARCH - NO CHANGES NEEDED
-    // ****************************************
-
-    // $("#retrieve-btn").click(function () {
-    //     let shopcart_id = $("#shopcart_id").val();
-        
-    //     $("#flash_message").empty();
-    //     console.log("Retrieving shopcart with ID:", shopcart_id);
-        
-    //     let ajax = $.ajax({
-    //         type: "GET",
-    //         url: `/shopcarts/${shopcart_id}`,
-    //         contentType: "application/json",
-    //         data: ''
-    //     })
-
-    //     ajax.done(function(res){
-    //         console.log("Success retrieving shopcart:", res);
-    //         update_form_data(res);
-    //         flash_message("Success");
-    //     });
-
-    //     ajax.fail(function(res){
-    //         clear_form_data();
-    //         flash_message(res.responseJSON.message);
-    //     });
-    // });
 
     // ****************************************
     // Delete a Shopcart - UPDATED
@@ -504,5 +476,63 @@ $(function () {
         });
     });
 
+
+    // ****************************************
+    // UPDATE AN ITEM IN A SHOPCART
+    // ****************************************
+    $("#update-btn").click(function () {
+        let shopcart_id = $("#shopcart_id").val();
+        let item_id = $("#item_id").val();
+        
+        // Validate required IDs
+        if (!shopcart_id || !item_id) {
+            flash_message("Both Shopcart ID and Item ID are required for updating.");
+            return; // Exit if required IDs are missing
+        }
+        
+        // Get item details from the form
+        let name = $("#name").val();
+        let quantity_str = $("#quantity").val();
+        let price_str = $("#price").val();
+        let description = $("#description").val();
+        
+        // Validate required item fields
+        if (!name || !quantity_str || !price_str) {
+            flash_message("Item Name, Quantity, and Price are required fields.");
+            return; // Exit if required fields are missing
+        }
+        
+        // Prepare JSON payload
+        let data = {
+            "id": item_id,
+            "name": name,
+            "quantity": parseInt(quantity_str), // Convert to integer
+            "price": parseFloat(price_str),     // Convert to float
+            "description": description
+        };
+        
+        // Clear flash message and perform AJAX PUT request
+        $("#flash_message").empty();
+        let ajax = $.ajax({
+            type: "PUT",
+            url: `/shopcarts/${shopcart_id}/items/${item_id}`,
+            contentType: "application/json",
+            data: JSON.stringify(data)
+        });
+        
+        // Handle Success
+        ajax.done(function(res){
+            update_form_data(res);
+            flash_message("Item successfully updated!");
+            
+            // Refresh the item list to show updated data
+            $("#search-btn").click();
+        });
+        
+        // Handle Failure
+        ajax.fail(function(res){
+            flash_message(res.responseJSON ? res.responseJSON.message : "Error updating item.");
+        });
+    });
 
 });

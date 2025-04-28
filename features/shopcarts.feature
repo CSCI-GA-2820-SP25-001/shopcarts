@@ -82,3 +82,24 @@ Feature: Shopcart and Item Management
         And the "price" field should be empty
         And the "description" field should be empty
 
+    Scenario: Update an item's name in a shopcart
+        When I visit the "Home Page"
+        # First create a shopcart
+        And I set the "shopcart_customer_id" to "6"
+        And I set the "shopcart id" to "6"
+        And I press the "Create shopcart" button
+        Then I should see the message "Success"
+        # Add an item to the shopcart
+        When I set the "item_id" to "103"
+        And I set the "name" to "Orange Juice" 
+        And I set the "quantity" to "2"
+        And I set the "price" to "4.99"
+        And I set the "description" to "Fresh squeezed orange juice"
+        And I press the "create item" button
+        Then I should see the message "Success"
+        # Update the item's name
+        When I change "name" to "Premium Orange Juice"
+        And I press the "update" button
+        Then I should see the message "Success"
+        Then I should see "Premium Orange Juice" in the item results table
+
