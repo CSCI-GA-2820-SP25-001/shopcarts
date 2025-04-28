@@ -68,6 +68,54 @@ tests/                     - test cases package
 └── test_routes.py         - test suite for service routes
 ```
 
+## API documentation
+### Shopcarts
+
+#### Shopcart Structure
+```json
+{
+    "customer_id": 6,
+    "id": 1,
+    "items": [],
+    "time_atc": "Thu, 24 Apr 2025 14:11:44 GMT"
+}
+```
+
+#### Shopcart API Endpoints
+
+| Action | Method & Endpoint | Request Payload | Response |
+|--------|------------------|-----------------|----------|
+| List all shopcarts | `GET /shopcarts` | N/A | Array of shopcart objects |
+| Get shopcart details | `GET /shopcarts/{shopcart_id}` | N/A | Shopcart object |
+| Create shopcart | `POST /shopcarts` | `{"customer_id": integer, "status": string}` | Created shopcart object |
+| Update shopcart | `PUT /shopcarts/{shopcart_id}` | `{"customer_id": integer, "status": string}` | Updated shopcart object |
+| Delete shopcart | `DELETE /shopcarts/{shopcart_id}` | N/A | 204 No Content |
+| Checkout shopcart | `PUT /shopcarts/{shopcart_id}/checkout` | N/A | Updated shopcart with status="CLOSED" |
+| Clear shopcart | `PUT /shopcarts/{shopcart_id}/clear` | N/A | Shopcart with no items |
+
+### Items
+
+#### Item Structure
+```json
+{
+        "description": "Fresh milk carton",
+        "id": 1273,
+        "name": "Milk",
+        "price": 3.5,
+        "quantity": 2
+}
+```
+
+#### Item API Endpoints
+
+| Action | Method & Endpoint | Request Payload | Response |
+|--------|------------------|-----------------|----------|
+| List items in shopcart | `GET /shopcarts/{shopcart_id}/items` | N/A | Array of item objects |
+| Get item details | `GET /shopcarts/{shopcart_id}/items/{item_id}` | N/A | Item object |
+| Add item to shopcart | `POST /shopcarts/{shopcart_id}/items` | `{"name": string, "quantity": integer, "price": float}` | Created item object |
+| Update item | `PUT /shopcarts/{shopcart_id}/items/{item_id}` | `{"name": string, "quantity": integer, "price": float}` | Updated item object |
+| Remove item | `DELETE /shopcarts/{shopcart_id}/items/{item_id}` | N/A | 204 No Content |
+
 ## License
 
 Copyright (c) 2016, 2025 [John Rofrano](https://www.linkedin.com/in/JohnRofrano/). All rights reserved.
