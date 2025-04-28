@@ -4,6 +4,7 @@ $(function () {
     //  U T I L I T Y   F U N C T I O N S - NEED TO ADJUST TO HAVE FUNCTION FOR CLEARING FORM INPUTS
     // ****************************************
 
+
     // Create a clipboard variable to store copied values
     let clipboard = "";
 
@@ -460,7 +461,7 @@ $(function () {
     });
 
 
-
+    
 
 
 

@@ -38,8 +38,6 @@ from compare3 import expect
 HTTP_200_OK = 200
 WAIT_TIMEOUT = 10
 
-ID_PREFIX = "shopcart_"
-
 
 def save_screenshot(context: Any, filename: str) -> None:
     """Takes a snapshot of the web page for debugging and validation
@@ -75,6 +73,65 @@ def step_impl(context: Any, text_string: str) -> None:
     assert text_string not in element.text
 
 
+@then('I should see "{text}" in the item results table')
+def step_impl(context: Any, text: str) -> None:
+    """
+    Checks if the specified text is present within the item results table's body,
+    ignoring the header row.
+
+    Args:
+        context (Any): The behave context.
+        text (str): The text to search for within the table body rows.
+    """
+    # Target the tbody within the div containing the item results table
+    table_body_selector = "#shopcart_find_results tbody"
+    # Wait for the table body to be present and check for text within it
+    try:
+        WebDriverWait(context.driver, context.wait_seconds).until(
+            expected_conditions.text_to_be_present_in_element(
+                (By.CSS_SELECTOR, table_body_selector), text
+            )
+        )
+        found = True
+    except TimeoutException:
+        found = False
+
+    assert (
+        found
+    ), f"'{text}' was not found within the table body '{table_body_selector}'"
+
+
+@then('I should not see "{text}" in the item results table')
+def step_impl(context: Any, text: str) -> None:
+    """
+    Checks if the specified text is NOT present within the item results table's body,
+    ignoring the header row.
+
+    Args:
+        context (Any): The behave context.
+        text (str): The text to search for within the table body rows.
+    """
+    # Target the tbody within the div containing the item results table
+    table_body_selector = "#shopcart_find_results tbody"
+    try:
+        # Ensure the table body is present first (or wait for it)
+        table_body = WebDriverWait(context.driver, context.wait_seconds).until(
+            expected_conditions.presence_of_element_located(
+                (By.CSS_SELECTOR, table_body_selector)
+            )
+        )
+        # Check the text within the located table body
+        assert (
+            text not in table_body.text
+        ), f"'{text}' was unexpectedly found within the table body '{table_body_selector}'"
+    except TimeoutException:
+        # If the table body never appears, the text isn't in it.
+        assert True
+    except NoSuchElementException:
+        # If the element is not found after waiting (should be caught by TimeoutException mostly)
+        assert True
+
+
 @when('I set the ID to "{text_string}"')
 def step_impl(context: Any, text_string: str) -> None:
     # Get a list of all the shopcarts
@@ -84,7 +141,7 @@ def step_impl(context: Any, text_string: str) -> None:
     response_data = context.resp.json()
     if response_data and len(response_data) > 0:
         text_string = str(response_data[0]["id"])
-    element_id = ID_PREFIX + "id"
+    element_id = "shopcart_id"
     element = context.driver.find_element(By.ID, element_id)
     element.clear()
     element.send_keys(text_string)
@@ -92,7 +149,7 @@ def step_impl(context: Any, text_string: str) -> None:
 
 @when('I set the "{element_name}" to "{text_string}"')
 def step_impl(context: Any, element_name: str, text_string: str) -> None:
-    element_id = ID_PREFIX + element_name.lower().replace(" ", "_")
+    element_id = element_name.lower().replace(" ", "_")
     element = context.driver.find_element(By.ID, element_id)
     element.clear()
     element.send_keys(text_string)
@@ -100,7 +157,7 @@ def step_impl(context: Any, element_name: str, text_string: str) -> None:
 
 @when('I select "{text}" in the "{element_name}" dropdown')
 def step_impl(context: Any, text: str, element_name: str) -> None:
-    element_id = ID_PREFIX + element_name.lower().replace(" ", "_")
+    element_id = element_name.lower().replace(" ", "_")
     element = Select(context.driver.find_element(By.ID, element_id))
     element.select_by_visible_text(text)
 
@@ -124,7 +181,7 @@ def step_impl(context: Any, element_name: str) -> None:
 ##################################################################
 @when('I copy the "{element_name}" field')
 def step_impl(context: Any, element_name: str) -> None:
-    element_id = ID_PREFIX + element_name.lower().replace(" ", "_")
+    element_id = element_name.lower().replace(" ", "_")
     element = WebDriverWait(context.driver, context.wait_seconds).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
@@ -134,7 +191,7 @@ def step_impl(context: Any, element_name: str) -> None:
 
 @when('I paste the "{element_name}" field')
 def step_impl(context: Any, element_name: str) -> None:
-    element_id = ID_PREFIX + element_name.lower().replace(" ", "_")
+    element_id = element_name.lower().replace(" ", "_")
     element = WebDriverWait(context.driver, context.wait_seconds).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
@@ -153,33 +210,26 @@ def step_impl(context: Any, element_name: str) -> None:
 
 @when('I press the "{button}" button')
 def step_impl(context: Any, button: str) -> None:
-    button_id = button.lower().replace(" ", "_") + "-btn"
+    button_id = button.lower().replace(" ", "-") + "-btn"
     context.driver.find_element(By.ID, button_id).click()
 
 
-@then('I should see "{name}" in the results')
-def step_impl(context: Any, name: str) -> None:
-    found = WebDriverWait(context.driver, context.wait_seconds).until(
-        expected_conditions.text_to_be_present_in_element(
-            (By.ID, "search_results"), name
-        )
-    )
-    assert found
-
-
 @then('I should see "{number}" shopcarts in the results')
-def step_impl(context: Any, number: int) -> None:
-    rows = context.driver.find_elements(
-        context.driver.find_element(By.ID, "all_shopcarts")
-    )
+def step_impl(context: Any, number: str) -> None:
+    """
+    Counts the number of shopcart data rows (ignoring the header) in the results table.
+
+    Args:
+        context (Any): The behave context.
+        number (str): The expected number of shopcarts as a string.
+    """
+    # Target rows within the tbody element of the all_shopcarts table
+    rows = context.driver.find_elements(By.CSS_SELECTOR, "#all_shopcarts tbody tr")
     row_count = len(rows)
     expected_count = int(number)
-    assert row_count == expected_count
-
-@then('I should not see "{name}" in the results')
-def step_impl(context: Any, name: str) -> None:
-    element = context.driver.find_element(By.ID, "search_results")
-    assert name not in element.text
+    assert (
+        row_count == expected_count
+    ), f"Expected {expected_count} shopcarts, but found {row_count}"
 
 
 @then('I should see the message "{message}"')
@@ -215,9 +265,29 @@ def step_impl(context: Any, text_string: str, element_name: str) -> None:
 
 @when('I change "{element_name}" to "{text_string}"')
 def step_impl(context: Any, element_name: str, text_string: str) -> None:
-    element_id = ID_PREFIX + element_name.lower().replace(" ", "_")
+    element_id = element_name.lower().replace(" ", "_")
     element = WebDriverWait(context.driver, context.wait_seconds).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
     element.clear()
     element.send_keys(text_string)
+
+@when('I clear the "{element_name}" field')
+def step_impl(context, element_name):
+    element_id = element_name.lower().replace(" ", "_")
+    element = context.driver.find_element(By.ID, element_id)
+    element.clear()
+
+@then('the "{element_name}" field should not be "{text_string}"')
+def step_impl(context, element_name, text_string):
+    element_id = element_name.lower().replace(" ", "_")
+    element = context.driver.find_element(By.ID, element_id)
+    actual_value = element.get_attribute("value")
+    assert actual_value != text_string, f"Expected {element_name} not to be '{text_string}', but it was."
+
+@then('the "{element_name}" field should not be empty')
+def step_impl(context, element_name):
+    element_id = element_name.lower().replace(" ", "_")
+    element = context.driver.find_element(By.ID, element_id)
+    actual_value = element.get_attribute("value")
+    assert actual_value != "", f"Expected {element_name} not to be empty, but it was."
