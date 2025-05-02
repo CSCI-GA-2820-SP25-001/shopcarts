@@ -355,6 +355,11 @@ def list_items(shopcart_id):
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>/items/<int:item_id>", methods=["PUT"])
 def update_item(shopcart_id, item_id):
+    """
+    Update an Item in a Shopcart
+
+    This endpoint will update an Item based on the data in the body that is posted
+    """
     app.logger.info("Request to update item %s for shopcart %s", item_id, shopcart_id)
     check_content_type("application/json")
 

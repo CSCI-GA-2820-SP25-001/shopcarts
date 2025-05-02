@@ -17,7 +17,7 @@ class Shopcart(db.Model, PersistentBase):
     Class that represents a Shopcart
     """
 
-    ### Translator
+    # Translator
     # Shopcart = Account
     # Item = Address
 

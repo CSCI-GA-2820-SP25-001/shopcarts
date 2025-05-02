@@ -3,9 +3,9 @@ Test Factory to make fake objects for testing
 """
 
 import factory
-from service.models import Shopcart, Item
-from factory import Factory, SubFactory, Sequence, Faker, post_generation
+from factory import post_generation
 from factory.fuzzy import FuzzyChoice, FuzzyInteger, FuzzyDecimal
+from service.models import Shopcart, Item
 
 
 class ShopcartFactory(factory.Factory):
@@ -18,7 +18,6 @@ class ShopcartFactory(factory.Factory):
 
     id = factory.Sequence(lambda n: n)
     customer_id = factory.Sequence(lambda n: n)
-
     time_atc = factory.Faker("date_time")
 
     @post_generation
@@ -32,14 +31,18 @@ class ShopcartFactory(factory.Factory):
         if extracted:
             self.items = extracted
 
-    # Todo: Add your other attributes here...
-
 
 class ItemFactory(factory.Factory):
-    """Creates fake grocery items with realistic test data"""
+    """Creates fake items for shopcarts with realistic test data
 
-    class Meta:
-        model = Item  # Assuming the Item model is defined elsewhere
+    This factory generates items with common grocery products
+    and realistic prices and quantities for testing
+    """
+
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Maps factory to data model"""
+
+        model = Item
 
     id = factory.Sequence(lambda n: n)
     shopcart_id = None
