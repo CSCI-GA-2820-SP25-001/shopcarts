@@ -1,6 +1,6 @@
 
-name: CI Build
-on:
+name: CI Build  # GitHub Actions workflow for CI/CD pipeline
+on:  # Trigger workflow on push or pull request to master, except README.md changes
   push:
     branches:
       - master
@@ -14,23 +14,21 @@ on:
     - 'README.md'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    # use a known build environment
-    container: python:3.11-slim
+  build:  # Main build job
+    runs-on: ubuntu-latest  # Use Ubuntu runner
+    container: python:3.11-slim  # Use Python 3.11 slim container for consistency
 
-    # Required services    
+    # Required services
     services:
-      # Label used to access the service container
-      postgres:
-        image: postgres:15-alpine
+      postgres:  # PostgreSQL service for integration tests
+        image: postgres:15-alpine  # Use official lightweight Postgres image
         env:
-            POSTGRES_USER: myuser
-            POSTGRES_PASSWORD: mypassword
-            POSTGRES_DB: mydatabase
+            POSTGRES_USER: myuser  # Set Postgres username
+            POSTGRES_PASSWORD: mypassword  # Set Postgres password
+            POSTGRES_DB: mydatabase  # Set default database
         ports:
-          - 5432:5432
-        # Set health checks to wait until postgres has started
+          - 5432:5432  # Expose Postgres port
+        # Health check to ensure Postgres is ready before tests run
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -39,26 +37,26 @@ jobs:
 
     # Steps for the build
     steps:
-      - name: Checkout
+      - name: Checkout  # Clone repository code
         uses: actions/checkout@v3
       
-      - name: Install Python package dependencies
+      - name: Install Python package dependencies  # Install pip, pipenv, and all dependencies
         run: |
           python -m pip install -U pip pipenv
           pipenv install --system --dev
 
-      - name: Linting
+      - name: Linting  # Run flake8 and pylint for code quality checks
         run: |
           flake8 service tests --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 service tests --count --max-complexity=10 --max-line-length=127 --statistics
           pylint service tests --max-line-length=127
 
-      - name: Run unit tests with nose
+      - name: Run unit tests with nose  # Run pytest with coverage, fail if coverage <95%
         run: |
           pytest --pspec --cov=service --cov-fail-under=95
         env:
-          FLASK_APP: wsgi:app
-          DATABASE_URI: "postgresql+psycopg://myuser:mypassword@localhost:5432/mydatabase"
+          FLASK_APP: wsgi:app  # Set Flask app entrypoint
+          DATABASE_URI: "postgresql+psycopg://myuser:mypassword@localhost:5432/mydatabase"  # DB connection string
 
-      - name: Upload code coverage
+      - name: Upload code coverage  # Upload coverage report to Codecov
         uses: codecov/codecov-action@v3.1.4
