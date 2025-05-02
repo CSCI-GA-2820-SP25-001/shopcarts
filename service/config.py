@@ -7,7 +7,7 @@ import logging
 # Get configuration from environment
 DATABASE_URI = os.getenv(
     "DATABASE_URI",
-    "postgresql+psycopg://postgres:postgres@localhost:5432/postgres"
+    "postgresql+psycopg://root:password@localhost:5432/postgres"
 )
 
 # Configure SQLAlchemy
