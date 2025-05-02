@@ -479,5 +479,16 @@ $(function () {
             flash_message(res.responseJSON ? res.responseJSON.message : "Error updating item.");
         });
     });
-
+    
+    // ****************************************
+    // Click on Shopcart Row to Search
+    // ****************************************
+    $("#all_shopcarts tbody").on("click", "tr", function(){
+        // Grab the first <td> (Shopcart ID)
+        const id = $(this).find("td:first").text().trim();
+        // Fill the search field
+        $("#shopcart_id").val(id);
+        // Trigger the search immediately
+        $("#search-btn").click();
+    });
 });
