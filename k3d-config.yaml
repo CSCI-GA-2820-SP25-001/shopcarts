@@ -4,7 +4,7 @@ name: nyu-devops
 servers: 1
 agents: 1
 ports:
-  - port: 8080:80
+  - port: 8000:80
     nodeFilters:
       - loadbalancer
 registries:
