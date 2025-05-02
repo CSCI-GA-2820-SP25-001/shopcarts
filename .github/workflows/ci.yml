@@ -25,7 +25,7 @@ jobs:
         env:
             POSTGRES_USER: myuser  # Set Postgres username
             POSTGRES_PASSWORD: postgres  # Set Postgres password
-            POSTGRES_DB: mydatabase  # Set default database
+            POSTGRES_DB: testdb  # Set default database
         ports:
           - 5432:5432  # Expose Postgres port
         # Health check to ensure Postgres is ready before tests run
