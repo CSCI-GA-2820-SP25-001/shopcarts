@@ -21,13 +21,12 @@ Test Shopcart API Service Test Suite
 # pylint: disable=duplicate-code
 import os
 import logging
+from decimal import Decimal
 from unittest import TestCase
 from wsgi import app
 from tests.factories import ShopcartFactory, ItemFactory
 from service.common import status
 from service.models import db, Shopcart
-
-from decimal import Decimal
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
@@ -69,7 +68,7 @@ class TestShopcartService(TestCase):
         db.session.remove()
 
     ######################################################################
-    #  H E L P E R   M E T H O D S
+    #  H E L P E R   M E T H O DS
     ######################################################################
 
     def _create_shopcarts(self, count):
@@ -96,7 +95,7 @@ class TestShopcartService(TestCase):
         """It should call the Home Page"""
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertIn("/shopcarts", resp.get_json()["paths"])
+        self.assertIn("text/html", resp.content_type)
 
     def test_health_check(self):
         """It should confirm the service is healthy"""
