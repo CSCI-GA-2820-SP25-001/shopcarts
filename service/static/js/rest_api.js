@@ -345,20 +345,11 @@ $(function () {
 
                 // Populate Items table (existing logic)
                 $("#shopcart_find_results").empty(); // Clear previous results if any
-                let table = '<table class="table table-striped table-hover">'
-                table += '<thead><tr>'
-                table += '<th class="col-md-1">Item ID</th>'
-                table += '<th class="col-md-2">Name</th>'
-                table += '<th class="col-md-1">Quantity</th>'
-                table += '<th class="col-md-1">Price</th>'
-                table += '<th class="col-md-7">Description</th>'
-                table += '</tr></thead><tbody>'
-
-
+                let tableRows = '';
                 if (res.items.length > 0) {
                     for (let j = 0; j < res.items.length; j++) {
                         let item = res.items[j];
-                        table += `<tr id="row_${j}">
+                        tableRows += `<tr id="row_${j}">
                             <td>${item.id || ""}</td>
                             <td>${item.name || ""}</td>
                             <td>${item.quantity || ""}</td>
@@ -366,26 +357,21 @@ $(function () {
                             <td>${item.description || ""}</td>
                         </tr>`;
                     }
-                    
-                    // Update form with first item's data
                     update_form_with_first_item(res.items);
                 } else {
-                    // Handle case where the shopcart has no items
-                    table += `<tr><td colspan="5">No items found in this shopcart.</td></tr>`;
+                    tableRows = `<tr><td colspan="5">No items found in this shopcart.</td></tr>`;
                 }
-
-                table += '</tbody></table>';
-                $("#shopcart_find_results").html(table);
+                $("#items_table_body").html(tableRows);
                 flash_message("Success");
             } else {
                 // Handle unexpected response format
-                $("#shopcart_find_results").html('<p>Could not display items. Unexpected response format.</p>');
+                $("#items_table_body").html('<tr><td colspan="5">Could not display items. Unexpected response format.</td></tr>');
                 flash_message("Error: Unexpected response format.");
             }
         });
 
         ajax.fail(function(res){
-            $("#shopcart_find_results").empty(); // Clear results on failure
+            $("#items_table_body").empty(); // Clear results on failure
             flash_message(res.responseJSON ? res.responseJSON.message : "An error occurred");
         });
 
