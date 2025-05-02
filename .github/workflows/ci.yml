@@ -24,7 +24,7 @@ jobs:
         image: postgres:15-alpine  # Use official lightweight Postgres image
         env:
             POSTGRES_USER: myuser  # Set Postgres username
-            POSTGRES_PASSWORD: mypassword  # Set Postgres password
+            POSTGRES_PASSWORD: pgs3cr3t  # Set Postgres password
             POSTGRES_DB: mydatabase  # Set default database
         ports:
           - 5432:5432  # Expose Postgres port

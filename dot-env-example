@@ -1,4 +1,3 @@
 PORT=8000
 FLASK_APP=wsgi:app
 WAIT_SECONDS=5
-DATABASE_URI=postgresql+psycopg://root:password@localhost:5432/postgres
