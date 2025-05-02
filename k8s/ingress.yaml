@@ -15,4 +15,4 @@ spec:
               service:
                 name: shopcarts
                 port:
-                  number: 8000
+                  number: 8080
