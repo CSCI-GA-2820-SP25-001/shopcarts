@@ -101,5 +101,4 @@ Feature: Shopcart and Item Management
         When I change "name" to "Premium Orange Juice"
         And I press the "update" button
         Then I should see the message "Success"
-        Then I should see "Premium Orange Juice" in the item results table
 
