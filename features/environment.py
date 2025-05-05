@@ -2,9 +2,9 @@
 Environment for Behave Testing
 """
 
+import tempfile
 from os import getenv
 from selenium import webdriver
-import tempfile
 
 WAIT_SECONDS = int(getenv("WAIT_SECONDS", "30"))
 BASE_URL = getenv("BASE_URL", "http://localhost:8080")

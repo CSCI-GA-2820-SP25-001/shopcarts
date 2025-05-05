@@ -27,7 +27,7 @@ from service.models import Shopcart, Item, db
 from .factories import ShopcartFactory, ItemFactory
 
 DATABASE_URI = os.getenv(
-    "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
+    "DATABASE_URI", "postgresql+psycopg://postgres:pgs3cr3t@postgres:5432/postgres"
 )
 
 BASE_URL = "/shopcarts"
