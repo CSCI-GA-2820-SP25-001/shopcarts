@@ -45,6 +45,9 @@ def create_app():
         from service import routes  # noqa: F401 E402
         from service.common import error_handlers, cli_commands  # noqa: F401, E402
 
+        # Initialize error handlers
+        error_handlers.initialize_error_handlers(app)
+
         try:
             db.create_all()
         except Exception as error:  # pylint: disable=broad-except

@@ -55,11 +55,19 @@ class Shopcart(db.Model, PersistentBase):
             data (dict): A dictionary containing the resource data
         """
         try:
-            self.id = data["id"]
-            self.customer_id = data["customer_id"]
+            # id is optional since it's generated for new shopcarts
+            if "id" in data:
+                self.id = data["id"]
+
+            # Validate customer_id is an integer
+            customer_id = data["customer_id"]
+            if not isinstance(customer_id, int):
+                raise TypeError("customer_id must be an integer")
+            self.customer_id = customer_id
+
             self.time_atc = data["time_atc"]
             # handle inner list of items
-            item_list = data.get("items")
+            item_list = data.get("items", [])
             for json_item in item_list:
                 item = Item()
                 item.deserialize(json_item)
@@ -73,7 +81,7 @@ class Shopcart(db.Model, PersistentBase):
             ) from error
         except TypeError as error:
             raise DataValidationError(
-                "Invalid Shopcart: body of request contained bad or no data "
+                "Invalid Shopcart: body of request contained bad or no data - "
                 + str(error)
             ) from error
         return self
