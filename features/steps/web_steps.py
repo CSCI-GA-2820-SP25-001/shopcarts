@@ -29,11 +29,9 @@ import logging
 from typing import Any
 from behave import when, then  # pylint: disable=no-name-in-module
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import Select, WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
-import requests
-from compare3 import expect
 
 # Constants for HTTP status codes and timeout
 HTTP_200_OK = 200
