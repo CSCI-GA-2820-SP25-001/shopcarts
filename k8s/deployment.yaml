@@ -22,7 +22,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: shopcarts
-          image: bleibowitz13/shopcarts:1.0
+          image: cluster-registry:5000/shopcarts:1.0
           # image: shopcarts
           imagePullPolicy: IfNotPresent
           ports:
