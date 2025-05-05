@@ -62,10 +62,21 @@ def create_shopcart():
     app.logger.info("Request to create a Shopcart")
     check_content_type("application/json")
 
+    shopcart_json = request.get_json()
+
+    # Validate customer_id is present and is an integer
+    if not shopcart_json or "customer_id" not in shopcart_json:
+        abort(status.HTTP_400_BAD_REQUEST, "Customer ID is required")
+
+    try:
+        customer_id = int(shopcart_json["customer_id"])
+        shopcart_json["customer_id"] = customer_id
+    except (ValueError, TypeError):
+        abort(status.HTTP_400_BAD_REQUEST, "Customer ID must be an integer")
+
     # Create the shopcart
     shopcart = Shopcart()
 
-    shopcart_json = request.get_json()
     if "time_atc" not in shopcart_json:
         shopcart_json["time_atc"] = datetime.datetime.now().strftime(
             "%Y-%m-%dT%H:%M:%S"

@@ -23,10 +23,12 @@ import os
 import logging
 from decimal import Decimal
 from unittest import TestCase
+from unittest.mock import patch
 from wsgi import app
 from tests.factories import ShopcartFactory, ItemFactory
-from service.common import status
 from service.models import db, Shopcart
+from service.common import status
+from service import create_app
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:pgs3cr3t@postgres:5432/postgres"
@@ -252,6 +254,76 @@ class TestShopcartService(TestCase):
         """It should fail to create a shopcart with invalid content type"""
         resp = self.client.post(BASE_URL, data="{}", content_type="text/plain")
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_data_validation_error(self):
+        """It should handle DataValidationError"""
+        shopcart = self._create_shopcarts(1)[0]
+        # Try to update with invalid data type but valid time_atc
+        resp = self.client.put(
+            f"{BASE_URL}/{shopcart.id}",
+            json={
+                "customer_id": "not-an-integer",
+                "time_atc": shopcart.time_atc.strftime("%a, %d %b %Y %H:%M:%S GMT"),
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        data = resp.get_json()
+        self.assertIn("customer_id must be an integer", data["message"])
+
+    def test_mediatype_not_supported(self):
+        """It should return 415 when media type is not supported"""
+        shopcart = self._create_shopcarts(1)[0]
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/items",
+            data="not-json",
+            content_type="text/plain",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_method_not_allowed_on_item(self):
+        """It should not allow an illegal method call on item endpoint"""
+        shopcart = self._create_shopcarts(1)[0]
+        resp = self.client.patch(f"{BASE_URL}/{shopcart.id}/items/1")
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_database_initialization_error(self):
+        """It should handle database initialization errors"""
+        with patch("service.models.db.create_all") as mock_db:
+            mock_db.side_effect = Exception("Could not connect to database")
+            with self.assertRaises(SystemExit) as context_manager:
+                create_app()
+            self.assertEqual(context_manager.exception.code, 4)
+
+    def test_error_handlers(self):
+        """Test various error handlers"""
+        # Test 404 not found
+        resp = self.client.get(f"{BASE_URL}/999999")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        data = resp.get_json()
+        self.assertEqual(data["error"], "Not Found")
+
+        # Test 405 method not allowed
+        resp = self.client.patch(f"{BASE_URL}/1")
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        data = resp.get_json()
+        self.assertEqual(data["error"], "Method not Allowed")
+
+        # Test 415 unsupported media type
+        resp = self.client.post(
+            BASE_URL, headers={"content-type": "text/xml"}, data="<xml>data</xml>"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        data = resp.get_json()
+        self.assertEqual(data["error"], "Unsupported media type")
+
+        # Test 400 bad request
+        resp = self.client.post(
+            BASE_URL, headers={"content-type": "application/json"}, data="invalid-json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        data = resp.get_json()
+        self.assertEqual(data["error"], "Bad Request")
 
     ######################################################################
     #  ITEM  T E S T   C A S E S

@@ -75,7 +75,7 @@ def data_validation_error(error):
         jsonify(
             status=status.HTTP_400_BAD_REQUEST,
             error="Bad Request",
-            message=error.message,
+            message=str(error),
         ),
         status.HTTP_400_BAD_REQUEST,
     )
