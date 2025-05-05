@@ -7,7 +7,7 @@ from selenium import webdriver
 import tempfile
 
 WAIT_SECONDS = int(getenv("WAIT_SECONDS", "30"))
-BASE_URL = getenv("BASE_URL", "http://localhost:8000")
+BASE_URL = getenv("BASE_URL", "http://localhost:8080")
 DRIVER = getenv("DRIVER", "chrome").lower()
 
 
